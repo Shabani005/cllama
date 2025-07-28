@@ -1,18 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <cuda_runtime.h>
+#include "/opt/cuda/include/cuda_runtime_api.h"
 
-#define GIG 1073741824
+
+#define GIG (1024 * 1024 * 1024) / 4
 
 int main() {
-    size_t N = GIG; // 2 GB for float (4 bytes each)
+    size_t gigs = 4;
+    size_t N = GIG*gigs; 
     float *host_array = (float*)malloc(N * sizeof(float));
     if (!host_array) {
         printf("Host malloc failed\n");
         return 1;
     }
-
+    
     for (size_t i = 0; i < N; ++i) host_array[i] = (float)i;
 
     float *device_array;
@@ -31,9 +33,10 @@ int main() {
         return 1;
     }
 
-  free(host_array); 
-  printf("Allocated and copied 2 GB to GPU. Sleeping for 10 seconds...\n");
-  sleep(100);
+  free(host_array);
+  u_int sleep_time = 100;
+  printf("Allocated and copied %zu GB to GPU. Sleeping for %u seconds...\n", gigs, sleep_time);
+  sleep(sleep_time);
 
     cudaFree(device_array);
     
